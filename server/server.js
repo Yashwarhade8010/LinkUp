@@ -1,6 +1,6 @@
 require("dotenv").config()
 const express = require('express');
-const { MongoConnect } = require('./mogoconnection');
+const { MongoConnect } = require("./mongoConnection");
 const {oauthoSession} = require("./config/passport")
 const userRoutes = require("./routes/userRoutes")
 
