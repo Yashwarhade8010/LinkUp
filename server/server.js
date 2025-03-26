@@ -8,6 +8,7 @@ MongoConnect()
 
 const app = express();
 
+app.use(express.json());
 oauthoSession(app);
 
 app.use("/",userRoutes);

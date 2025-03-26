@@ -13,7 +13,11 @@ const generateToken = (user) => {
 };
 
 const verifyToken = (token) => {
-  return jwt.verify(token);
+  try {
+    return jwt.verify(token, process.env.SECRET);
+  } catch (error) {
+    return null; // Return null if the token is invalid
+  }
 };
 
 module.exports = {

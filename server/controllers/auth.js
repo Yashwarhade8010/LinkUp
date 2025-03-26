@@ -1,13 +1,15 @@
 const User = require("../models/user");
+const { generateToken } = require("../config/jsontoken");
+const passport = require("passport");
 
 const handleRegister = async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
-    return res.status(400).json({message:"All fields required"});
+    return res.status(400).json({ message: "All fields required" });
   }
 
   try {
-    const checkUser = await User.findOne({ $or: [{ email }, { username }] });
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res
         .status(400)
@@ -19,36 +21,77 @@ const handleRegister = async (req, res) => {
       email,
       password,
     });
-    return res.status(201).json({message:"User registered successfully",user});
+    const token = generateToken(user);
+    const userToSend = user.toObject();
+    delete userToSend.password;
 
+    return res
+      .status(201)
+      .json({ message: "User registered successfully", userToSend, token });
   } catch (err) {
-    res.status(500).json({message:"Error occured"});
+    res.status(500).json({ message: "Error occured" });
   }
 };
 
-const handleLogin = async(req,res)=>{
-    const{usernameOrEmail,password} = req.body;
-    if(!usernameOrEmail || !password){
-        return res.status(400).json({message:"All fields required"})
+const handleLogin = async (req, res) => {
+  const { usernameOrEmail, password } = req.body;
+  if (!usernameOrEmail || !password) {
+    return res.status(400).json({ message: "All fields required" });
+  }
+  try {
+    const user = await User.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "No user found" });
     }
-    try{
-        const user = await User.findOne({$or:[{username:usernameOrEmail},{email:usernameOrEmail}]})
-        if(!user){
-            return res.status(404).json({message:"No user found"})
-        }
-        const verify = await User.matchPassword(user.password);
-        if(verify==false){
-            return res.status(400).json({message:"Invalid credentials"})
-        }else{
-            return res.status(200).json({message:"Logged In successfully",user})
-        }
-    }catch(err){
-        console.log(err);
-        res.status(500).json({message:"Error occured"})
+
+    const verify = await user.matchPassword(password);
+
+    const userToSend = user.toObject();
+    delete userToSend.password;
+
+    if (!verify) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    } else {
+      const token = generateToken(user);
+      return res
+        .status(200)
+        .json({ message: "Logged In successfully", userToSend, token });
     }
-}
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error occured" });
+  }
+};
+
+const oAuth = passport.authenticate("google", { scope: ["profile", "email"] });
+
+const oAuthVerify = (req, res, next) => {
+  passport.authenticate("google", { failureRedirect: "/" }, (err, user) => {
+    if (err || !user) {
+      return res.status(401).json({ message: "OAuth authentication failed" });
+    }
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Login error" });
+      }
+      return res.status(200).json({ message: "Logged in successfully", user });
+    });
+  })(req, res, next);
+};
+
+const logout = (req, res) => {
+  req.logout(() => {
+    return res.status(200).json({ message: "Loged out successfully" });
+  });
+};
 
 module.exports = {
-    handleRegister,
-    handleLogin
-}
+  handleRegister,
+  handleLogin,
+  oAuth,
+  logout,
+  oAuthVerify,
+};
