@@ -12,6 +12,10 @@ const {
   handleFollow,
   handleUnFollow,
   handleCreatePost,
+  handlePostDelete,
+  handleLikePost,
+  handleSeePost,
+  handleCommentOnPost,
 } = require("../controllers/user");
 const { upload } = require("../config/multer");
 
@@ -42,5 +46,9 @@ router.post("/profile/:id", (req, res) => {
 });
 
 router.post("/post/create", upload.single("image"), handleCreatePost);
+router.post("/post/delete", handlePostDelete);
+router.post("/post/like", handleLikePost);
+router.get("/post/:id", handleSeePost);
+router.post("/post/comment", handleCommentOnPost);
 
 module.exports = router;
