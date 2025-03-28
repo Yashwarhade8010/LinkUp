@@ -18,6 +18,7 @@ const {
   handleCommentOnPost,
 } = require("../controllers/user");
 const { upload } = require("../config/multer");
+const { checkAuth } = require("../middleware/auth");
 
 const router = Router();
 
@@ -45,10 +46,15 @@ router.post("/profile/:id", (req, res) => {
   }
 });
 
-router.post("/post/create", upload.single("image"), handleCreatePost);
-router.post("/post/delete", handlePostDelete);
-router.post("/post/like", handleLikePost);
-router.get("/post/:id", handleSeePost);
-router.post("/post/comment", handleCommentOnPost);
+router.post(
+  "/post/create",
+  checkAuth,
+  upload.single("image"),
+  handleCreatePost
+);
+router.post("/post/delete", checkAuth, handlePostDelete);
+router.post("/post/like", checkAuth, handleLikePost);
+router.get("/post/:id", checkAuth, handleSeePost);
+router.post("/post/comment", checkAuth, handleCommentOnPost);
 
 module.exports = router;

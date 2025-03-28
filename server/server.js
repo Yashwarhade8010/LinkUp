@@ -3,14 +3,22 @@ const express = require('express');
 const { MongoConnect } = require("./mongoConnection");
 const {oauthoSession} = require("./config/passport")
 const userRoutes = require("./routes/userRoutes")
-
-MongoConnect()
+const cors = require("cors");
+const { limiter } = require("./middleware/rateLimiter");
+MongoConnect();
 
 const app = express();
 
+app.use(
+  cors({
+    origin: [],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 oauthoSession(app);
 
-app.use("/",userRoutes);
+app.use("/", limiter, userRoutes);
 
 app.listen(process.env.PORT,()=>console.log("Server started at port "+process.env.PORT));
