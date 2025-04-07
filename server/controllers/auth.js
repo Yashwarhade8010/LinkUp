@@ -1,9 +1,11 @@
 const User = require("../models/user");
 const { generateToken } = require("../config/jsontoken");
 const passport = require("passport");
+const { uploadToCloudinary } = require("../config/cloudinary");
 
 const handleRegister = async (req, res) => {
   const { username, email, password } = req.body;
+  const image = req.file;
   if (!username || !email || !password) {
     return res.status(400).json({ message: "All fields required" });
   }
@@ -16,11 +18,22 @@ const handleRegister = async (req, res) => {
         .json({ message: "Username or Email already exists" });
     }
 
+    let Pfp = null;
+    if (image) {
+      try {
+        Pfp = await uploadToCloudinary(image.buffer);
+      } catch (err) {
+        return res.status(500).json({ message: "Failed to upload image" });
+      }
+    }
+
     const user = await User.create({
       username,
+      profilePic: Pfp,
       email,
       password,
     });
+
     const token = generateToken(user);
     const userToSend = user.toObject();
     delete userToSend.password;
@@ -29,12 +42,14 @@ const handleRegister = async (req, res) => {
       .status(201)
       .json({ message: "User registered successfully", userToSend, token });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Error occured" });
   }
 };
 
 const handleLogin = async (req, res) => {
   const { usernameOrEmail, password } = req.body;
+
   if (!usernameOrEmail || !password) {
     return res.status(400).json({ message: "All fields required" });
   }
@@ -77,6 +92,7 @@ const oAuthVerify = (req, res, next) => {
       if (err) {
         return res.status(500).json({ message: "Login error" });
       }
+
       return res.status(200).json({ message: "Logged in successfully", user });
     });
   })(req, res, next);

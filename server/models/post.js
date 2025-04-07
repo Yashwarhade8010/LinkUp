@@ -42,6 +42,10 @@ const postSchema = new Schema(
         ref: "User",
       },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

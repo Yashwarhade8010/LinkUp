@@ -16,6 +16,7 @@ const {
   handleLikePost,
   handleSeePost,
   handleCommentOnPost,
+  handleFeed,
 } = require("../controllers/user");
 const { upload } = require("../config/multer");
 const { checkAuth } = require("../middleware/auth");
@@ -32,11 +33,11 @@ router.get("/dashboard", (req, res) => {
   res.send(`Hello, ${req.user.displayName}`);
 });
 router.post("/login", handleLogin);
-router.post("/register", handleRegister);
+router.post("/register", upload.single("image"), handleRegister);
 router.get("/logout", logout);
 
 router.get("/profile/:id", profile);
-router.post("/profile/:id", (req, res) => {
+router.post("/profile/:id", checkAuth, (req, res) => {
   const { action } = req.body;
   if (action == "follow") {
     return handleFollow(req, res);
@@ -52,9 +53,12 @@ router.post(
   upload.single("image"),
   handleCreatePost
 );
+
 router.post("/post/delete", checkAuth, handlePostDelete);
-router.post("/post/like", checkAuth, handleLikePost);
+router.post("/post/like/:id", checkAuth, handleLikePost);
 router.get("/post/:id", checkAuth, handleSeePost);
 router.post("/post/comment", checkAuth, handleCommentOnPost);
+
+router.get("/feed", checkAuth, handleFeed);
 
 module.exports = router;
