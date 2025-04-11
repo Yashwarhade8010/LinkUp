@@ -159,6 +159,7 @@ const handlePostDelete = async (req, res) => {
 const handleLikePost = async (req, res) => {
   const postId = req.params.id;
   const userId = req.user._id;
+  console.log(postId);
   if (!postId || !userId) {
     return res.status(400).json({ message: "All fields required" });
   }
@@ -221,7 +222,6 @@ const handleFeed = async (req, res) => {
   try {
     const user = await User.findById(userId).select("-password");
     const followingIds = user.following;
-    console.log(followingIds);
     const posts = await Post.find({
       author: { $in: followingIds },
     })
