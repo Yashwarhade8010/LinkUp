@@ -1,5 +1,5 @@
 import axios from "axios"
 
 export const axiosInstance = axios.create({
-    baseURL:"http://localhost:4000/"
-})
+  baseURL: "https://linkup-1-3d9b.onrender.com/",
+});
