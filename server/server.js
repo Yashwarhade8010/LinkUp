@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://link-up-stbt.vercel.app/"],
+    origin: ["https://link-up-stbt.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
