@@ -21,4 +21,6 @@ oauthoSession(app);
 
 app.use("/", limiter, userRoutes);
 
-app.listen(process.env.PORT,()=>console.log("Server started at port "+process.env.PORT));
+app.listen(process.env.PORT || 4000, () =>
+  console.log("Server started at port " + process.env.PORT)
+);
