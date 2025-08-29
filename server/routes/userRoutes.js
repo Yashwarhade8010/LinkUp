@@ -17,6 +17,7 @@ const {
   handleSeePost,
   handleCommentOnPost,
   handleFeed,
+  handleEditPfp,
 } = require("../controllers/user");
 const { upload } = require("../config/multer");
 const { checkAuth } = require("../middleware/auth");
@@ -46,6 +47,7 @@ router.post("/profile/:id", checkAuth, (req, res) => {
     return handleUnFollow(req, res);
   }
 });
+router.post("/profile/edit", checkAuth, upload.single("image"), handleEditPfp);
 
 router.post(
   "/post/create",
@@ -53,6 +55,7 @@ router.post(
   upload.single("image"),
   handleCreatePost
 );
+
 
 router.post("/post/delete", checkAuth, handlePostDelete);
 router.post("/post/like/:id", checkAuth, handleLikePost);

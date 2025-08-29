@@ -10,6 +10,7 @@ import {
   Menu,
   MenuItem,
   Badge,
+  Button,
 } from "@mui/material";
 import {
   Search,
@@ -23,6 +24,8 @@ import useUserStore from "../stores/userStore";
 import { Link } from "react-router-dom";
 import LinkUpLogo from "./Logo";
 import MobileMenu from "./MobileMenu";
+import LogoutDialog from "./LogoutDialog";
+import AddToPhotosOutlinedIcon from "@mui/icons-material/AddToPhotosOutlined";
 
 const StyledToolbar = styled(Toolbar)({
   display: "flex",
@@ -46,8 +49,11 @@ const Icons = styled(Box)(({ theme }) => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [showMenu,setShowMenu] = useState(false)
-  const logOut = useUserStore((state)=>state.logOut)
+  const [showMenu, setShowMenu] = useState(false);
+  const [Dialog, setDialog] = useState(false);
+  const logOut = useUserStore((state) => state.logOut);
+  const user = useUserStore((state) => state.user);
+
   const handleAvatarClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -57,35 +63,52 @@ const Navbar = () => {
   };
 
   const userLogOut = () => {
-      logOut();
-      navigate("/signin");
-    };
- 
+    logOut();
+    setDialog(false);
+    localStorage.removeItem("user-storage");
+    navigate("/signin");
+  };
 
   return (
     <AppBar position="sticky" color="primary">
       <StyledToolbar>
-        <Typography variant="h6" sx={{  display: { xs: "none", sm: "block" } }}>
+        <Typography variant="h6" sx={{ display: { xs: "none", sm: "block" } }}>
           LinkUp
         </Typography>
-        <IconButton onClick={()=>setShowMenu(!showMenu)}>
-        <MenuIcon sx={{ display: { xs: "block", sm: "none" } }} />
+        <IconButton onClick={() => setShowMenu(!showMenu)}>
+          <MenuIcon sx={{ display: { xs: "block", sm: "none" } }} />
         </IconButton>
-        <Typography variant="h6" sx={{  display: { xs: "block", sm: "none" } }}>
+        <Typography variant="h6" sx={{ display: { xs: "block", sm: "none" } }}>
           LinkUp
         </Typography>
-        <MobileMenu showMenu={showMenu} onClose={() => setShowMenu(false)}/>
+        <MobileMenu
+          showMenu={showMenu}
+          onClose={() => setShowMenu(false)}
+          logOut={userLogOut}
+          setDialog={setDialog}
+        />
         <SearchBar>
           <Search sx={{ marginRight: "10px" }} />
           <InputBase placeholder="Search..." fullWidth />
         </SearchBar>
-        <Icons sx={{ display: { xs: "none",sm:"flex" } }}>
-        <Link style={{textDecoration:"none",color:"inherit"}} to={"/dashboard"}>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <Home />
-            </Badge>
+        <Link
+          style={{ textDecoration: "none", color: "inherit" }}
+          to={"/addpost"}
+        >
+          <IconButton variant="contained" color="inherit">
+            <AddToPhotosOutlinedIcon />
           </IconButton>
+        </Link>
+        <Icons sx={{ display: { xs: "none", sm: "flex" } }}>
+          <Link
+            style={{ textDecoration: "none", color: "inherit" }}
+            to={"/dashboard"}
+          >
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="error">
+                <Home />
+              </Badge>
+            </IconButton>
           </Link>
           <IconButton color="inherit">
             <Badge badgeContent={2} color="error">
@@ -98,8 +121,8 @@ const Navbar = () => {
             </Badge>
           </IconButton>
           <Avatar
-            src="https://i.pravatar.cc/150?img=47"
-            sx={{ width: 30, height: 30, cursor: "pointer" }}
+            src={user.profilePic}
+            sx={{ width: 40, height: 40, cursor: "pointer" }}
             onClick={handleAvatarClick}
           />
         </Icons>
@@ -114,10 +137,20 @@ const Navbar = () => {
           horizontal: "right",
         }}
       >
-        <Link style={{textDecoration:"none",color:"inherit"}} to={"/profile"}><MenuItem >Profile</MenuItem></Link>
+        <Link
+          style={{ textDecoration: "none", color: "inherit" }}
+          to={"/profile"}
+        >
+          <MenuItem>Profile</MenuItem>
+        </Link>
         <MenuItem onClick={handleCloseMenu}>My Account</MenuItem>
-        <MenuItem onClick={userLogOut}>Logout</MenuItem>
+        <MenuItem onClick={() => setDialog(true)}>Logout</MenuItem>
       </Menu>
+      <LogoutDialog
+        open={Dialog}
+        onClose={() => setDialog(false)}
+        onConfirm={userLogOut}
+      />
     </AppBar>
   );
 };

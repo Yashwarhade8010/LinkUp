@@ -21,6 +21,9 @@ const userSchema = new Schema(
       required: true,
       lowercase: true,
     },
+    bio: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { axiosInstance } from "../axiosInstance";
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -18,6 +18,7 @@ import { Edit } from "@mui/icons-material";
 import useUserStore from "../stores/userStore";
 import useLoadStore from "../stores/useStore";
 import Navbar from "../components/Navbar";
+
 
 const Profile = () => {
   const { id } = useParams();
@@ -88,13 +89,15 @@ const Profile = () => {
             <Divider sx={{ my: 2 }} />
 
             {/* Edit Profile Button */}
-            <Button
-              variant="contained"
-              startIcon={<Edit />}
-              sx={{ mt: 1, borderRadius: 2, px: 3 }}
-            >
-              Edit Profile
-            </Button>
+            <Link to={"/Edit"}>
+              <Button
+                variant="contained"
+                startIcon={<Edit />}
+                sx={{ mt: 1, borderRadius: 2, px: 3 }}
+              >
+                Edit Profile
+              </Button>
+            </Link>
           </CardContent>
         </Card>
         <Typography
@@ -116,13 +119,13 @@ const Profile = () => {
             sx={{ display: "flex", justifyContent: "center" }}
           >
             {profile.posts.map((post) => (
-              <Grid item xs={12} sm={6} md={3} key={post._id}>
+              <Grid item xs={12} sm={5} md={3} key={post._id}>
                 <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
                   <img
                     src={post.imageUrl}
                     alt="Post"
                     style={{
-                      width: "100%",
+                      width: "190px",
                       height: "200px",
                       objectFit: "cover",
                       borderTopLeftRadius: "12px",

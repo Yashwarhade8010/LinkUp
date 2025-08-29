@@ -29,6 +29,31 @@ const profile = async (req, res) => {
   }
 };
 
+const handleEditPfp = async (req, res) => {
+  const userId = req.body.userId;
+  const profile = req.body.profile;
+  const image = req.file;
+  console.log(userId, profile, image);
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "No user found" });
+    }
+    let pfp = null;
+    if (image) {
+      try {
+        pfp = await uploadToCloudinary(image.buffer);
+      } catch (err) {
+        return res.status(500).json({ message: "Failed to upload image" });
+      }
+    }
+    await user.updateOne({ bio: profile, profilePic: pfp });
+    return res.status(201).json({ message: "Profile updated successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: "Error occured" });
+  }
+};
+
 const handleFollow = async (req, res) => {
   const loggedInUserId = req.user._id;
   const userId = req.params.id;
@@ -90,10 +115,11 @@ const handleCreatePost = async (req, res) => {
   const { caption } = req.body;
   const image = req.file;
   const userId = req.user._id;
-
+  console.log(image);
   if (!userId || !caption || !image) {
     return res.status(404).json({ message: "All fields required" });
   }
+
   try {
     let post = null;
     if (image) {
@@ -215,7 +241,8 @@ const handleFeed = async (req, res) => {
   if (!userId) {
     return res.status(400).json({ message: "No userId provided" });
   }
-  const data = await client.get("posts");
+  const cacheKey = `posts:${userId}`;
+  const data = await client.get(cacheKey);
   if (data) {
     return res.status(200).json(JSON.parse(data));
   }
@@ -235,8 +262,8 @@ const handleFeed = async (req, res) => {
     if (!posts) {
       return res.status(404).json({ message: "No posts found" });
     }
-    await client.set("posts", JSON.stringify(posts));
-    await client.expire("posts", 10);
+    await client.set(cacheKey, JSON.stringify(posts));
+    await client.expire(cacheKey, 10);
     return res.status(200).json(posts);
   } catch (err) {
     console.log(err);
@@ -254,4 +281,5 @@ module.exports = {
   handleSeePost,
   handleCommentOnPost,
   handleFeed,
+  handleEditPfp,
 };

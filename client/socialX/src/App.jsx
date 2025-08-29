@@ -12,6 +12,8 @@ import DashBoard from "./pages/DashBoard";
 import FullScreenLoader from "./components/FullScreenLoader";
 import useUserStore from "./stores/userStore";
 import ProtectedRoutes from "./config/ProtectedRoutes";
+import PostPage from "./pages/PostPage";
+import EditPfp from "./components/EditPfp";
 
 function App() {
   return (
@@ -35,6 +37,22 @@ function App() {
             element={
               <ProtectedRoutes>
                 <DashBoard />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="/addpost"
+            element={
+              <ProtectedRoutes>
+                <PostPage />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="/Edit"
+            element={
+              <ProtectedRoutes>
+                <EditPfp />
               </ProtectedRoutes>
             }
           />

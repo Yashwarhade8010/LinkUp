@@ -82,6 +82,13 @@ const Feed = () => {
                   component="img"
                   image={post.imageUrl}
                   alt="Post image"
+                  sx={{
+                    width: "100%",
+                    height: { xs: 350, md: 500 }, // or adjust based on design
+                    objectFit: "cover", // or 'contain'
+                    borderRadius: 2,
+                    backgroundColor: "#eee",
+                  }}
                 />
               )}
               <CardContent>
@@ -91,8 +98,9 @@ const Feed = () => {
                 sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <IconButton onClick={() => handleLike(post._id)}>
-                  {post.likes.includes()}
+                  <Favorite />
                 </IconButton>
+                <Typography>{post.likes.length} Likes</Typography>
                 <IconButton>
                   <ChatBubble />
                 </IconButton>
