@@ -59,7 +59,7 @@ const EditPfp = () => {
     formData.append("userId",user._id);
     try{
       const resp = await axiosInstance.post("/profile/edit",formData,{headers: { "Content-Type": "multipart/form-data"}})
-      console.log(resp)
+
       if(!resp){
         return toast.error(resp.data.message);
       }
