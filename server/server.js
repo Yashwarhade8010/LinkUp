@@ -5,7 +5,7 @@ const {oauthoSession} = require("./config/passport")
 const userRoutes = require("./routes/userRoutes")
 const cors = require("cors");
 const { limiter } = require("./middleware/rateLimiter");
-MongoConnect();
+
 
 const app = express();
 
@@ -18,6 +18,7 @@ app.use(
 );
 app.use(express.json({ limit: "10mb" }));
 oauthoSession(app);
+MongoConnect();
 
 app.use("/", limiter, userRoutes);
 
