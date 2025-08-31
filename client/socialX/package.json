@@ -1,6 +1,7 @@
 {
   "name": "package.json",
   "private": true,
+  "proxy":"https://linkup-1-3d9b.onrender.com",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
